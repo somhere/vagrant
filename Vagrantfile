@@ -57,7 +57,16 @@ Vagrant.configure("2") do |config|
     apt-get install -y nodejs
     apt-get install -y build-essential
 	apt-get install -y python-httplib2
+	
     wget https://packages.couchbase.com/releases/5.0.1/couchbase-server-community_5.0.1-ubuntu16.04_amd64.deb
     dpkg -i couchbase-server-community_5.0.1-ubuntu16.04_amd64.deb
+	
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	echo " Expected fingerprint = 9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88 "
+	sudo apt-key fingerprint 0EBFCD88 | grep fingerprint
+	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	sudo apt-get install -y docker-ce
+	sudo docker run hello-world
+	sudo systemctl enable docker	
   SHELL
 end
