@@ -15,12 +15,13 @@ Vagrant.configure("2") do |config|
   # within the machine from a port on the host machine.
   # NOTE: This will enable public access to the opened port
   config.vm.network "forwarded_port", guest: 8080, host: 8080
-  config.vm.network "forwarded_port", guest: 18091, host: 18091
-  config.vm.network "forwarded_port", guest: 8091, host: 8091
+  # config.vm.network "forwarded_port", guest: 18091, host: 18091
+  # config.vm.network "forwarded_port", guest: 8091, host: 8091
   
-  for i in 3000..3010
-    config.vm.network :forwarded_port, guest: i, host: i
-  end
+  # open ports in loop
+  # for i in 3000..3010
+  #   config.vm.network :forwarded_port, guest: i, host: i
+  # end
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
@@ -44,28 +45,41 @@ Vagrant.configure("2") do |config|
 
   # Customize the amount of memory and cpu on VM
   config.vm.provider "virtualbox" do |vb|
-    vb.cpus = "4"
-    vb.memory = "6144"
-    #vb.gui = true
+    vb.cpus = "1"
+    vb.memory = "2048"
+    vb.gui = true
   end
   
+  
+  config.vm.provision "unity", type: "shell", run:"once", inline: <<-SHELL
+    apt-get install ubuntu-desktop -y
+    apt-get check
+    apt-get install -fy
+  SHELL
+
+  config.vm.provision "git-curl", type: "shell", run:"once", inline: <<-SHELL
+    apt-get install git curl -y
+  SHELL
+
+  config.vm.provision "vscode", type: "shell", run:"once", inline: <<-SHELL
+    wget https://az764295.vo.msecnd.net/stable/79b44aa704ce542d8ca4a3cc44cfca566e7720f1/code_1.21.1-1521038896_amd64.deb
+    dpkg -i code_1.21.1-1521038896_amd64.deb 
+  SHELL
+
   config.vm.provision "node8", type: "shell", run:"once", inline: <<-SHELL
-    apt-get clean
+  apt-get clean
     apt-get update
     cd ~
     curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
     bash nodesource_setup.sh
     apt-get install -y nodejs
     apt-get install -y build-essential
-	apt-get install -y python-httplib2
-	
-
+	  apt-get install -y python-httplib2
   SHELL
   
    # vagrant provision --provision-with docker  run:never|once|always
   config.vm.provision "docker", type: "shell", run:"once", inline: <<-SHELL
     echo "Provisioning docker ---------------------------------------------"
-#	
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     echo " Expected fingerprint = 9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88 "
     sudo apt-key fingerprint 0EBFCD88 | grep fingerprint
